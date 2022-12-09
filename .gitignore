@@ -1,0 +1,8 @@
+.py[co]
+.pytest_cache
+[.]venv
+.idea
+__pycache__
+
+.aoc_cache
+
