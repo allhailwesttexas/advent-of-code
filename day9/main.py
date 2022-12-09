@@ -1,30 +1,62 @@
 from shared.utils import fetch_input
 
 
-def tick(head: tuple[int, int], tails: list[tuple[int, int]], visited: set[tuple[int, int]], move: str) -> tuple[tuple[int, int], list[tuple[int, int]]]:
-    op, size = move.split()
-    for _ in range(int(size)):
+class Rope:
+    def __init__(self, rope_length: int):
+        self.head = (0, 0)
+        self.tails = [(0, 0) for _ in range(rope_length-1)]
+        self.visited = set()
+
+    def move(self, move: str):
+        op, steps = move.split()
+        for _ in range(int(steps)):
+            self.head = self.move_head(op)
+            new_tails = []
+            old_tail = self.head
+            for tail in self.tails:
+                new_tail = self.move_tail(old_tail, tail)
+                new_tails.append(new_tail)
+                old_tail = new_tail
+            self.visited.add(new_tails[-1])
+            self.tails = new_tails
+
+    def move_head(self, op: str) -> tuple[int, int]:
         if op == "L":
-            head = head[0] - 1, head[1]
+            return self.head[0] - 1, self.head[1]
         elif op == "R":
-            head = head[0] + 1, head[1]
+            return self.head[0] + 1, self.head[1]
         elif op == "U":
-            head = head[0], head[1] - 1
+            return self.head[0], self.head[1] - 1
         elif op == "D":
-            head = head[0], head[1] + 1
-        new_tails = []
-        old_tail = head
-        for tail in tails:
-            new_tail = move_tail(old_tail, tail)
-            new_tails.append(new_tail)
-            old_tail = new_tail
-        visited.add(new_tails[-1])
-        tails = new_tails
-        # print(f"{move=}")
-        # render_map(5, 6, head, tails)
-    # print(f"{move=}: {head=}, {tails=}")
-    # print(f"{visited=}")
-    return head, tails
+            return self.head[0], self.head[1] + 1
+
+    @classmethod
+    def move_tail(cls, head: tuple[int, int], tail: tuple[int, int]) -> tuple[int, int]:
+        if cls.touching(head, tail):
+            return tail
+
+        dx = head[0] - tail[0]
+        dy = head[1] - tail[1]
+        x_move = y_move = 0
+
+        if abs(dx):
+            x_move = 1 if dx > 0 else -1
+        if abs(dy):
+            y_move = 1 if dy > 0 else -1
+        return tail[0] + x_move, tail[1] + y_move
+
+    @classmethod
+    def touching(cls, head, tail) -> bool:
+        dx = head[0] - tail[0]
+        dy = head[1] - tail[1]
+        return any(
+            [
+                head == tail,
+                not dx and abs(dy) == 1,
+                not dy and abs(dx) == 1,
+                abs(dy) == 1 and abs(dx) == 1,
+            ]
+        )
 
 
 def render_map(rows, cols, head, tails):
@@ -42,88 +74,35 @@ def render_map(rows, cols, head, tails):
     print()
 
 
-def move_tail(head: tuple[int, int], tail: tuple[int, int]) -> tuple[int, int]:
-    dx = head[0] - tail[0]
-    dy = head[1] - tail[1]
-
-    if touching(head, tail):
-        return tail
-    elif two_steps_away_x(head, tail):
-        return tail[0] + dx - (1 if dx > 0 else -1), tail[1]
-    elif two_steps_away_y(head, tail):
-        return tail[0], tail[1] + dy - (1 if dy > 0 else -1)
-
-    # diagonal move
-    new_x = tail[0] + (1 if dx > 0 else -1)
-    new_y = tail[1] + (1 if dy > 0 else -1)
-    return new_x, new_y
-
-
-def two_steps_away_x(head, tail) -> bool:
-    dx = head[0] - tail[0]
-    dy = head[1] - tail[1]
-    return abs(dx) == 2 and not dy
-
-
-def two_steps_away_y(head, tail) -> bool:
-    dx = head[0] - tail[0]
-    dy = head[1] - tail[1]
-    return abs(dy) == 2 and not dx
-
-
-def touching(head, tail) -> bool:
-    dx = head[0] - tail[0]
-    dy = head[1] - tail[1]
-    return any(
-        [
-            head == tail,
-            not dx and abs(dy) == 1,
-            not dy and abs(dx) == 1,
-            abs(dy) == 1 and abs(dx) == 1,
-        ]
-    )
-
-
 def test():
-    head = (0, 0)
-    tails = [(0, 0)]
-    visited = set()
+    rope = Rope(rope_length=2)
     for move in ['R 4', 'U 4', 'L 3', 'D 1', 'R 4', 'D 1', 'L 5', 'R 2']:
-        head, tails = tick(head, tails, visited, move)
-    assert len(visited) == 13, len(visited)
+        rope.move(move)
+    assert len(rope.visited) == 13
 
-    head = (0, 4)
-    tails = [(0, 4) for _ in range(9)]
-    visited = set()
+    rope = Rope(rope_length=10)
     for move in ['R 4', 'U 4', 'L 3', 'D 1', 'R 4', 'D 1', 'L 5', 'R 2']:
-        head, tails = tick(head, tails, visited, move)
-    assert len(visited) == 1
+        rope.move(move)
+    assert len(rope.visited) == 1
 
-    head = (11, 15)
-    tails = [(11, 15) for _ in range(9)]
-    visited = set()
+    rope = Rope(rope_length=10)
     for move in ['R 5', 'U 8', 'L 8', 'D 3', 'R 17', 'D 10', 'L 25', 'U 20']:
-        head, tails = tick(head, tails, visited, move)
-    assert len(visited) == 36, len(visited)
+        rope.move(move)
+    assert len(rope.visited) == 36
 
 
 def solve() -> tuple[int, int]:
     test()
     data = fetch_input(day=9)
-    head = (0, 0)
-    tails = [(0, 0)]
-    visited = set()
-    for move in data:
-        head, tails = tick(head, tails, visited, move)
-    first_score = len(visited)
 
-    head = (0, 0)
-    tails = [(0, 0) for _ in range(9)]
-    v2 = set()
+    r2 = Rope(rope_length=2)
     for move in data:
-        head, tails = tick(head, tails, v2, move)
-    second_score = len(v2)
-    return first_score, second_score
+        r2.move(move)
+
+    r10 = Rope(rope_length=10)
+    for move in data:
+        r10.move(move)
+    return len(r2.visited), len(r10.visited)
 
 
 if __name__ == "__main__":
