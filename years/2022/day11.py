@@ -16,7 +16,6 @@ class Monkey:
             worry_func: Callable[[int], int] = lambda x: x,
     ):
         self.items = items
-        # self.op = op
         self.inspecter = inspecter
         self.divisible_by = divisible_by
         self.targets = targets
@@ -48,7 +47,6 @@ class Monkey:
         )
         divisible_by = int(tester_val)
         inspecter = cls.get_inspecter(inspecter)
-        # op = raw[2].replace("Operation: new = ", '')
         return Monkey(items, inspecter, divisible_by, targets)
 
     @classmethod
