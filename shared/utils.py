@@ -18,8 +18,9 @@ CACHE_FOLDER = REPO_FOLDER / Path(".aoc_cache")
 
 
 def fetch_input(*, year=2022, day, session=None, use_cache=True):
-    CACHE_FOLDER.mkdir(exist_ok=True)
-    fpath = CACHE_FOLDER / Path(f"input{day}.txt")
+    folder = CACHE_FOLDER / Path(f"{year}")
+    folder.mkdir(exist_ok=True)
+    fpath = folder / Path(f"input{day}.txt")
     if fpath.exists() and use_cache:
         with open(fpath, "r") as fi:
             return [line.rstrip() for line in fi]
