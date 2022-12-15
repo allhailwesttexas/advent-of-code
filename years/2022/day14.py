@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from itertools import chain
 from typing import Iterator
 
+from shared.geom import Grid
 from shared.utils import fetch_input
 
 
@@ -21,27 +22,6 @@ class Point:
             yield Point(x, self.y)
         for y in range(min(self.y, other.y), max(self.y, other.y)+1):
             yield Point(self.x, y)
-
-
-class Grid:
-    def __init__(self, lines: list[list[str]]):
-        self.lines = lines
-
-    def __contains__(self, p: Point):
-        return not (p.x < 0 or p.y < 0 or p.x >= len(self.lines[0]) or p.y >= len(self.lines))
-
-    def __getitem__(self, p: Point | int):
-        if isinstance(p, Point):
-            return self.lines[p.y][p.x]
-        return self.lines[p]
-
-    def __setitem__(self, p: Point, value: str):
-        self.lines[p.y][p.x] = value
-
-    def __str__(self):
-        lines = ['  ' + ''.join(map(str, range(len(self.lines[0]))))] + \
-            [f"{i}  " + ''.join(row) for i, row in enumerate(self.lines)]
-        return '\n'.join(lines) + '\n'
 
 
 class Cave(Grid):
