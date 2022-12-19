@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from itertools import chain
 from typing import Iterator
 
 
@@ -16,19 +15,18 @@ class Point:
     def __sub__(self, other: Point) -> Point:
         return Point(self.x - other.x, self.y - other.y)
 
-    # def __eq__(self, other: Point) -> bool:
-    #     return self.x == other.x and self.y == other.y
+    def __eq__(self, other: Point) -> bool:
+        return self.x == other.x and self.y == other.y
 
     def manhattan(self, other: Point) -> int:
         return abs(self.x - other.x) + abs(self.y - other.y)
 
-    def points_at_distance(self, distance: int) -> Iterator[Point]:
-        for d in range(distance):
-            for v in [Point(0, d), Point(0, -d), Point(d, 0), Point(-d, 0)]:
-                yield self + v
+    def points_at_distance(self, d: int) -> Iterator[Point]:
+        for v in [Point(0, d), Point(0, -d), Point(d, 0), Point(-d, 0)]:
+            yield self + v
 
     def nearby_points(self, other: Point) -> Iterator[Point]:
-        for distance in range(self.manhattan(other)):
+        for distance in range(1, self.manhattan(other)):
             yield from self.points_at_distance(distance)
 
 
