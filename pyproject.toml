@@ -1,18 +1,14 @@
-[tool.poetry]
+[project]
 name = "advent-of-code"
 version = "0.1.0"
-description = ""
-authors = ["Peter Stensmyr <peter.stensmyr@gmail.com>"]
+description = "Some advent of code solutions."
 readme = "README.md"
-packages = [{include = "advent_of_code"}]
+requires-python = ">=3.13"
+dependencies = [
+    "requests>=2.32.3",
+]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-requests = "^2.28.1"
-
-[tool.poetry.group.dev.dependencies]
-black = "^22.10.0"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[dependency-groups]
+dev = [
+    "ruff>=0.8.1",
+]
