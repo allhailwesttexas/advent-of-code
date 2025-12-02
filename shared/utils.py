@@ -43,9 +43,14 @@ def fetch_input(*, year=2022, day, session=None, use_cache=True):
 
     r = requests.get(f"{ADVENT_URL}/{year}/day/{day}/input", cookies=cookies)
 
-    if not r.text.startswith("Puzzle inputs differ by user"):
-        with open(fpath.absolute(), "w") as fo:
-            fo.writelines(r.text)
+    if r.text.startswith("Puzzle inputs differ by user"):
+        raise Exception(
+            "No session token available. You need to log in to https://www.adventofcode.com and get the "
+            "token from the browser console, check the `Cookie` header of any GET request for the `session` key."
+        )
+
+    with open(fpath.absolute(), "w") as fo:
+        fo.writelines(r.text)
 
     return r.text.splitlines()
 
