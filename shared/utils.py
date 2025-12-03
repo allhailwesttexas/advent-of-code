@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, T
 
 import requests
 
@@ -55,6 +55,6 @@ def fetch_input(*, year=2022, day, session=None, use_cache=True):
     return r.text.splitlines()
 
 
-def chunks(data: list, chunksize: int) -> Iterable[list]:
+def chunks(data: list[T] | str, chunksize: int) -> Iterable[T]:
     for i in range(0, len(data), chunksize):
         yield data[i:i+chunksize]
